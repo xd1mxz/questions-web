@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أسئلة وأجوبة</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; margin-bottom: 30px; padding: 20px; border-bottom: 1px solid #333; }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #fff; }
+        .admin-login { 
+            position: fixed; 
+            top: 20px; 
+            left: 20px; 
+            background: #111; 
+            padding: 10px; 
+            border-radius: 5px; 
+            border: 1px solid #333;
+        }
+        .questions-container { margin-top: 30px; }
+        .question { background: #111; padding: 15px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #333; }
+        .answer-input { 
+            width: 100%; 
+            padding: 10px; 
+            background: #222; 
+            border: 1px solid #444; 
+            color: #fff; 
+            border-radius: 3px; 
+            margin-top: 10px;
+            font-family: Arial, sans-serif;
+        }
+        .question-number { 
+            background: #333; 
+            color: #fff; 
+            width: 30px; 
+            height: 30px; 
+            border-radius: 50%; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        button { 
+            background: #444; 
+            color: white; 
+            border: none; 
+            padding: 8px 15px; 
+            cursor: pointer; 
+            border-radius: 3px; 
+            margin-top: 10px;
+        }
+        button:hover { background: #555; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #111;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid #444;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 5px;
+        }
+        .captcha {
+            background: #222;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .error { color: #ff5555; margin: 10px 0; }
+        .admin-panel {
+            background: #111;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 10px;
+            border: 2px solid #555;
+            display: none;
+        }
+        .admin-answer {
+            background: #222;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-right: 4px solid #444;
+        }
+        .answer-status {
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- زر تسجيل دخول المسؤول -->
+        <div class="admin-login">
+            <button onclick="showLoginModal()">دخول المسؤول</button>
+        </div>
+
+        <!-- الهيدر -->
+        <header>
+            <h1>أسئلة وأجوبة</h1>
+            <p>أجب على الأسئلة التالية بحرية</p>
+        </header>
+
+        <!-- الأسئلة -->
+        <div class="questions-container" id="questionsContainer">
+            <!-- الأسئلة تظهر هنا -->
+        </div>
+
+        <!-- لوحة المسؤول -->
+        <div class="admin-panel" id="adminPanel">
+            <h2>لوحة المسؤول - الإجابات</h2>
+            <div id="adminAnswers">
+                <!-- إجابات المستخدمين تظهر هنا -->
+            </div>
+            <button onclick="logoutAdmin()" style="background: #666;">تسجيل خروج</button>
+        </div>
+    </div>
+
+    <!-- نافذة تسجيل الدخول -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2>تسجيل دخول المسؤول</h2>
+            <p>كلمة المرور: <span id="adminPasswordHint"></span></p>
+            
+            <div class="captcha" id="captchaContainer">
+                <p>أثبت أنك لست روبوت:</p>
+                <div id="captchaQuestion"></div>
+            </div>
+            
+            <input type="text" class="modal-input" id="captchaAnswer" placeholder="أدخل الإجابة">
+            <input type="password" class="modal-input" id="adminPassword" placeholder="كلمة المرور">
+            
+            <div id="loginError" class="error"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="loginAdmin()" style="background: #555; flex: 1;">دخول</button>
+                <button onclick="hideLoginModal()" style="background: #333; flex: 1;">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
