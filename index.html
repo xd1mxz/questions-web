@@ -32,12 +32,20 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .user-name-form {
+            background: #111;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
         .question {
             background: #111;
             padding: 15px;
             margin: 10px 0;
             border-radius: 5px;
             border: 1px solid #333;
+            display: none;
         }
         textarea {
             width: 100%;
@@ -47,6 +55,7 @@
             color: white;
             border: 1px solid #444;
             border-radius: 3px;
+            font-family: Arial, sans-serif;
         }
         .admin-panel {
             background: #111;
@@ -81,6 +90,29 @@
             border-radius: 3px;
             cursor: pointer;
         }
+        .user-info {
+            background: #222;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .answer-item {
+            background: #222;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #555;
+        }
+        .user-name {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .timestamp {
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -89,28 +121,55 @@
     <div class="container">
         <h1>الأسئلة</h1>
         
+        <!-- نموذج إدخال اسم المستخدم -->
+        <div id="userNameForm" class="user-name-form">
+            <h3>مرحباً! ما هو اسمك؟</h3>
+            <input type="text" id="userName" placeholder="أدخل اسمك هنا" maxlength="30">
+            <button onclick="saveUserName()">بدء الإجابة</button>
+            <p style="margin-top: 10px; color: #aaa; font-size: 14px;">
+                سيتم حفظ إجاباتك مع اسمك
+            </p>
+        </div>
+        
+        <!-- معلومات المستخدم -->
+        <div id="userInfo" class="user-info" style="display: none;">
+            <p>أنت تجيب باسم: <span id="currentUserName"></span></p>
+            <button onclick="changeUserName()" style="background: #444; font-size: 12px;">تغيير الاسم</button>
+        </div>
+        
+        <!-- نموذج تسجيل دخول المسؤول -->
         <div id="loginForm" class="login-form">
             <h3>تسجيل دخول المسؤول</h3>
-            <p>أدخل: 2 + 3 = ?</p>
+            <p>أدخل: 5 + 2 = ?</p>
             <input type="text" id="captcha" placeholder="أدخل الإجابة">
             <input type="password" id="password" placeholder="كلمة المرور">
             <button onclick="login()">دخول</button>
+            <button onclick="hideLogin()" style="background: #333;">إلغاء</button>
             <p id="loginError" style="color: red; margin-top: 10px;"></p>
         </div>
         
+        <!-- الأسئلة -->
         <div id="questionsContainer">
             <!-- الأسئلة تظهر هنا -->
         </div>
         
+        <!-- لوحة المسؤول -->
         <div id="adminPanel" class="admin-panel">
-            <h2>إجابات المستخدمين</h2>
-            <div id="answersList"></div>
-            <button onclick="logout()">خروج</button>
+            <h2>👨‍💼 إجابات المستخدمين</h2>
+            <div id="userList">
+                <!-- قائمة المستخدمين تظهر هنا -->
+            </div>
+            <div id="answersList">
+                <!-- الإجابات تظهر هنا -->
+            </div>
+            <button onclick="logout()" style="background: #666;">تسجيل خروج</button>
+            <button onclick="clearAllData()" style="background: #d32f2f; margin-left: 10px;">مسح جميع البيانات</button>
         </div>
     </div>
 
     <script>
-        // الأسئلة الأساسية
+        // ==================== المتغيرات ====================
+        const ADMIN_PASS = "admin123";
         let questions = [
             {id: 1, text: "ما هو لون التفاح؟"},
             {id: 2, text: "كم عدد أيام الأسبوع؟"},
@@ -124,77 +183,233 @@
             {id: 10, text: "ما أصغر وحدة في المادة؟"}
         ];
 
-        // كلمة مرور المسؤول
-        const ADMIN_PASS = "123456";
+        // ==================== وظائف المستخدم ====================
+        
+        // حفظ اسم المستخدم
+        function saveUserName() {
+            const userName = document.getElementById('userName').value.trim();
+            if (!userName) {
+                alert("الرجاء إدخال اسمك");
+                return;
+            }
+            
+            localStorage.setItem('currentUserName', userName);
+            document.getElementById('userNameForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('currentUserName').textContent = userName;
+            
+            // عرض الأسئلة
+            showQuestions();
+            
+            // إظهار جميع الأسئلة
+            document.querySelectorAll('.question').forEach(q => {
+                q.style.display = 'block';
+            });
+        }
+
+        // تغيير اسم المستخدم
+        function changeUserName() {
+            document.getElementById('userNameForm').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('userName').value = localStorage.getItem('currentUserName') || '';
+        }
 
         // عرض الأسئلة
         function showQuestions() {
             let html = '';
             questions.forEach(q => {
-                let saved = localStorage.getItem('answer_' + q.id) || '';
+                const userName = localStorage.getItem('currentUserName') || 'مجهول';
+                const answerKey = `answer_${userName}_${q.id}`;
+                const savedAnswer = localStorage.getItem(answerKey) || '';
+                
                 html += `
-                    <div class="question">
+                    <div class="question" id="question_${q.id}">
                         <strong>${q.id}. ${q.text}</strong>
                         <textarea 
-                            placeholder="اكتب إجابتك..."
+                            placeholder="اكتب إجابتك هنا..."
+                            rows="3"
                             oninput="saveAnswer(${q.id}, this.value)"
-                        >${saved}</textarea>
+                        >${savedAnswer}</textarea>
+                        <div style="margin-top: 5px; font-size: 12px; color: #aaa;">
+                            ${savedAnswer ? '✓ تم الحفظ' : 'لم يتم الحفظ بعد'}
+                        </div>
                     </div>
                 `;
             });
             document.getElementById('questionsContainer').innerHTML = html;
         }
 
-        // حفظ الإجابة
-        function saveAnswer(id, answer) {
-            localStorage.setItem('answer_' + id, answer);
+        // حفظ الإجابة مع اسم المستخدم
+        function saveAnswer(questionId, answer) {
+            const userName = localStorage.getItem('currentUserName') || 'مجهول';
+            const answerKey = `answer_${userName}_${questionId}`;
+            const timestamp = new Date().toLocaleString('ar-SA');
+            
+            const answerData = {
+                answer: answer.trim(),
+                userName: userName,
+                questionId: questionId,
+                timestamp: timestamp,
+                questionText: questions.find(q => q.id === questionId)?.text || ''
+            };
+            
+            localStorage.setItem(answerKey, JSON.stringify(answerData));
+            
+            // تحديث حالة الحفظ
+            const statusDiv = document.querySelector(`#question_${questionId} div`);
+            if (statusDiv) {
+                statusDiv.textContent = answer.trim() ? '✓ تم الحفظ' : 'لم يتم الحفظ بعد';
+                statusDiv.style.color = answer.trim() ? '#4CAF50' : '#aaa';
+            }
         }
 
-        // عرض نموذج تسجيل الدخول
+        // ==================== وظائف المسؤول ====================
+        
+        // إظهار نموذج تسجيل الدخول
         function showLogin() {
             document.getElementById('loginForm').style.display = 'block';
         }
 
-        // تسجيل الدخول
+        // إخفاء نموذج تسجيل الدخول
+        function hideLogin() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('captcha').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // تسجيل دخول المسؤول
         function login() {
-            let captcha = document.getElementById('captcha').value;
-            let password = document.getElementById('password').value;
+            const captcha = document.getElementById('captcha').value;
+            const password = document.getElementById('password').value;
             
-            if (captcha === "5" && password === ADMIN_PASS) {
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                showAnswers();
-            } else {
-                document.getElementById('loginError').textContent = 
-                    captcha !== "5" ? "الإجابة خاطئة (2+3=5)" : "كلمة المرور خاطئة";
+            if (captcha !== "7") {
+                document.getElementById('loginError').textContent = "الإجابة خاطئة (5+2=7)";
+                return;
             }
+            
+            if (password !== ADMIN_PASS) {
+                document.getElementById('loginError').textContent = "كلمة المرور خاطئة";
+                return;
+            }
+            
+            // تسجيل الدخول الناجح
+            hideLogin();
+            document.getElementById('adminPanel').style.display = 'block';
+            showAllAnswers();
         }
 
-        // عرض الإجابات للمسؤول
-        function showAnswers() {
-            let html = '';
-            questions.forEach(q => {
-                let answer = localStorage.getItem('answer_' + q.id) || 'لم تتم الإجابة';
-                html += `
-                    <div class="question" style="margin: 10px 0; padding: 10px; background: #222;">
-                        <strong>${q.text}</strong><br>
-                        <span style="color: yellow;">${answer}</span>
+        // عرض جميع الإجابات للمسؤول
+        function showAllAnswers() {
+            const users = {};
+            const answersList = document.getElementById('answersList');
+            const userList = document.getElementById('userList');
+            
+            // مسح المحتوى السابق
+            answersList.innerHTML = '';
+            userList.innerHTML = '';
+            
+            // جمع جميع الإجابات من localStorage
+            const allAnswers = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                
+                if (key.startsWith('answer_')) {
+                    try {
+                        const answerData = JSON.parse(localStorage.getItem(key));
+                        allAnswers.push(answerData);
+                        
+                        // جمع أسماء المستخدمين
+                        if (answerData.userName && !users[answerData.userName]) {
+                            users[answerData.userName] = true;
+                        }
+                    } catch (e) {
+                        console.log('خطأ في تحليل البيانات:', key);
+                    }
+                }
+            }
+            
+            // عرض قائمة المستخدمين
+            if (Object.keys(users).length > 0) {
+                let userListHTML = '<h3>👥 المستخدمين:</h3>';
+                Object.keys(users).forEach(user => {
+                    userListHTML += `<span style="background: #333; padding: 5px 10px; margin: 0 5px 5px 0; border-radius: 3px; display: inline-block;">${user}</span>`;
+                });
+                userList.innerHTML = userListHTML;
+            }
+            
+            // عرض جميع الإجابات
+            if (allAnswers.length === 0) {
+                answersList.innerHTML = '<p style="color: #aaa; text-align: center;">لا توجد إجابات بعد</p>';
+                return;
+            }
+            
+            // ترتيب الإجابات حسب الوقت (من الأحدث)
+            allAnswers.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            // عرض الإجابات
+            allAnswers.forEach(item => {
+                if (!item.answer || item.answer.trim() === '') return;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-item';
+                answerDiv.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <span class="user-name">👤 ${item.userName}</span>
+                        <span style="float: left; color: #aaa; font-size: 12px;">
+                            ${item.timestamp}
+                        </span>
                     </div>
+                    <div><strong>السؤال:</strong> ${item.questionText}</div>
+                    <div style="margin-top: 5px;"><strong>الإجابة:</strong> ${item.answer}</div>
                 `;
+                answersList.appendChild(answerDiv);
             });
-            document.getElementById('answersList').innerHTML = html;
+            
+            // إضافة عدد الإجابات
+            const countDiv = document.createElement('div');
+            countDiv.style.cssText = 'background: #333; padding: 10px; border-radius: 5px; margin: 15px 0; text-align: center;';
+            countDiv.innerHTML = `<strong>عدد الإجابات: ${allAnswers.length}</strong>`;
+            answersList.insertBefore(countDiv, answersList.firstChild);
         }
 
-        // تسجيل الخروج
+        // تسجيل خروج المسؤول
         function logout() {
             document.getElementById('adminPanel').style.display = 'none';
         }
 
-        // التحميل الأولي
+        // مسح جميع البيانات
+        function clearAllData() {
+            if (confirm("هل أنت متأكد من مسح جميع الإجابات؟")) {
+                // مسح جميع الإجابات
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('answer_')) {
+                        localStorage.removeItem(key);
+                    }
+                }
+                alert("تم مسح جميع الإجابات");
+                showAllAnswers();
+            }
+        }
+
+        // ==================== التهيئة ====================
         document.addEventListener('DOMContentLoaded', function() {
-            showQuestions();
-            console.log('كلمة مرور المسؤول: 123456');
-            console.log('الإجابة على الكابتشا: 5 (2 + 3)');
+            // التحقق إذا كان هناك اسم مستخدم محفوظ
+            const savedName = localStorage.getItem('currentUserName');
+            if (savedName) {
+                document.getElementById('userNameForm').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('currentUserName').textContent = savedName;
+                showQuestions();
+            }
+            
+            console.log("معلومات الدخول للمسؤول:");
+            console.log("- الكابتشا: 7 (5 + 2)");
+            console.log("- كلمة المرور: admin123");
+            console.log("- لتعديل الأسئلة من الكونسول: questions[0].text = 'سؤال جديد'");
+            console.log("- ثم استدعِ showQuestions()");
         });
     </script>
 </body>
