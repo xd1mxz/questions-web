@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع الأسئلة العربية</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-question-circle"></i> موقع الأسئلة العربية</h1>
+            <p class="subtitle">اسأل واستفد وأضف أسئلتك الخاصة</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <h2>مرحباً بك في موقع الأسئلة</h2>
+            <p>هذا موقع بسيط لعرض الأسئلة والإجابات باللغة العربية. يمكنك إضافة أسئلتك الخاصة أو تصفح الأسئلة المطروحة.</p>
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-palette"></i>
+                    <h3>تصميم بسيط</h3>
+                    <p>تصميم أبيض وأسود مع خط عربي واضح</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>متجاوب مع الأجهزة</h3>
+                    <p>يعمل على جميع أحجام الشاشات</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-code-branch"></i>
+                    <h3>مستضاف على GitHub</h3>
+                    <p>سهل النشر والتعديل</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="questions-section">
+            <h2><i class="fas fa-list"></i> الأسئلة</h2>
+            <div class="filter">
+                <button class="filter-btn active" data-filter="all">الكل</button>
+                <button class="filter-btn" data-filter="general">عامة</button>
+                <button class="filter-btn" data-filter="tech">تقنية</button>
+                <button class="filter-btn" data-filter="education">تعليمية</button>
+            </div>
+            
+            <div class="questions-container">
+                <!-- سيتم إضافة الأسئلة ديناميكياً بواسطة JavaScript -->
+            </div>
+        </section>
+
+        <section class="add-question">
+            <h2><i class="fas fa-plus-circle"></i> أضف سؤالاً جديداً</h2>
+            <form id="questionForm">
+                <div class="form-group">
+                    <label for="questionText">نص السؤال:</label>
+                    <textarea id="questionText" placeholder="اكتب سؤالك هنا..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="questionCategory">الفئة:</label>
+                    <select id="questionCategory" required>
+                        <option value="">اختر فئة</option>
+                        <option value="general">عامة</option>
+                        <option value="tech">تقنية</option>
+                        <option value="education">تعليمية</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="questionerName">اسمك (اختياري):</label>
+                    <input type="text" id="questionerName" placeholder="اكتب اسمك">
+                </div>
+                <button type="submit" class="submit-btn">إضافة السؤال</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>تم إنشاء هذا الموقع باستخدام HTML, CSS, JavaScript واستضافة GitHub Pages</p>
+            <p class="github-link">
+                <i class="fab fa-github"></i> 
+                <a href="https://github.com" target="_blank">رابط المستودع على GitHub</a>
+            </p>
+            <p class="copyright">© 2023 موقع الأسئلة العربية. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
