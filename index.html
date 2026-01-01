@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أسئلة وأجوبة</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; margin-bottom: 30px; padding: 20px; border-bottom: 1px solid #333; }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #fff; }
+        .login-section { margin: 30px 0; padding: 20px; background: #111; border-radius: 5px; }
+        .form-group { margin-bottom: 15px; }
+        input { width: 100%; padding: 10px; background: #222; border: 1px solid #333; color: #fff; border-radius: 3px; }
+        button { background: #444; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 3px; }
+        button:hover { background: #555; }
+        .questions-container { margin-top: 30px; }
+        .question { background: #111; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .answer-input { width: 100%; padding: 10px; background: #222; border: 1px solid #333; color: #fff; border-radius: 3px; margin-top: 10px; }
+        .admin-panel { background: #111; padding: 20px; margin-top: 30px; border-radius: 5px; display: none; }
+        .admin-answer { background: #222; padding: 10px; margin: 5px 0; border-radius: 3px; }
+        .error { color: #ff4444; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>أسئلة وأجوبة</h1>
+            <p>أجب على الأسئلة التالية</p>
+        </header>
+
+        <div class="login-section" id="loginSection">
+            <h2>تسجيل دخول المسؤول</h2>
+            <div class="form-group">
+                <input type="password" id="adminPassword" placeholder="كلمة المرور">
+            </div>
+            <div class="form-group">
+                <p>أثبت أنك لست روبوت: <span id="captchaQuestion"></span></p>
+                <input type="text" id="captchaAnswer" placeholder="الإجابة">
+            </div>
+            <button onclick="loginAdmin()">دخول المسؤول</button>
+            <div id="loginError" class="error"></div>
+        </div>
+
+        <div class="questions-container" id="questionsContainer">
+            <!-- الأسئلة تظهر هنا -->
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <h2>لوحة المسؤول - إجابات المستخدمين</h2>
+            <div id="adminAnswers">
+                <!-- إجابات المستخدمين تظهر هنا -->
+            </div>
+            <button onclick="logoutAdmin()" style="margin-top: 20px; background: #666;">تسجيل خروج</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
